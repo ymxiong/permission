@@ -15,8 +15,12 @@ import java.lang.annotation.*;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public @interface PermissionLimit {
 
+    /**
+     * 权限细节
+     * @return 权限细节
+     */
     String value() default "";
 
-    String name() default "";
+    String[] limits() default {};
 
 }

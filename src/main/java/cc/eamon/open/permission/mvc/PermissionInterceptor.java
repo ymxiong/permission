@@ -34,9 +34,9 @@ public class PermissionInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if (checker.preHandle(request,response,handler)){
+        if (checker.preHandle(request, response, handler)) {
             return permissionControl(request, response, handler);
-        }else{
+        } else {
             return false;
         }
     }
@@ -49,37 +49,41 @@ public class PermissionInterceptor implements HandlerInterceptor {
             HandlerMethod hm = (HandlerMethod) handler;
             // Object target = hm.getBean();
             Class<?> clazz = hm.getBeanType();
-            Method m = hm.getMethod();
+            Method method = hm.getMethod();
             try {
-                if (clazz != null && m != null) {
+                if (clazz != null && method != null) {
                     boolean isClzAnnotation = clazz.isAnnotationPresent(Permission.class);
-                    boolean isMethodAnnotation = m.isAnnotationPresent(PermissionLimit.class);
+                    boolean isMethodAnnotation = method.isAnnotationPresent(PermissionLimit.class);
 
-                    Permission pc;
-                    PermissionLimit rc;
-                    String methodPermissionName;
+                    Permission permission;
+                    PermissionLimit permissionLimit;
 
-                    if (isClzAnnotation){
-                        pc = clazz.getAnnotation(Permission.class);
-
-                    }else {
+                    // 判断是否存在类注解 无注解时不拦截此类
+                    if (isClzAnnotation) {
+                        permission = clazz.getAnnotation(Permission.class);
+                    } else {
                         return true;
                     }
 
-
+                    // 判断是否存在方法注解 无注解时不拦截此方法
                     if (isMethodAnnotation) {
-                        rc = m.getAnnotation(PermissionLimit.class);
-                        if (rc.name().equals("")){
-                            methodPermissionName = pc.value().toLowerCase() + "_" + m.getName();
-                        }else {
-                            methodPermissionName = pc.value().toLowerCase() + "_" + rc.name();
-                        }
-                    }else {
+                        permissionLimit = method.getAnnotation(PermissionLimit.class);
+                    } else {
                         return true;
                     }
 
-                    if (!checker.check(request, response, methodPermissionName, rc.value())){
-                        throw new Exception();
+
+
+                    if (!checker.check(
+                            request,
+                            response,
+                            clazz,
+                            permission.value(),
+                            permission.limits(),
+                            method,
+                            permissionLimit.value(),
+                            permissionLimit.limits())) {
+                        throw new PermissionException("Permission Low");
                     }
                 }
             } catch (Exception e) {
@@ -88,7 +92,7 @@ public class PermissionInterceptor implements HandlerInterceptor {
                 response.setStatus(200);
                 try {
                     Object o = checker.handleException(response, e);
-                    if (o != null){
+                    if (o != null) {
                         response.getWriter().write(o.toString());
                     }
                     return false;
@@ -113,7 +117,6 @@ public class PermissionInterceptor implements HandlerInterceptor {
             throws Exception {
         checker.afterCompletion(request, response, handler, ex);
     }
-
 
 
 }

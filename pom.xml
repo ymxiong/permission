@@ -8,6 +8,14 @@
     <artifactId>permission</artifactId>
     <version>0.1.0</version>
 
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring-version>5.1.1.RELEASE</spring-version>
+        <javax-servlet-version>3.1.0</javax-servlet-version>
+        <javapoet-version>1.1.0</javapoet-version>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -20,8 +28,30 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.0.1</version>
+            </plugin>
         </plugins>
     </build>
+
+
 
     <dependencies>
 
@@ -29,6 +59,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
+            <version>${spring-version}</version>
         </dependency>
         <!-- end of spring -->
 
@@ -36,6 +67,7 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
+            <version>${javax-servlet-version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- end of servlet -->
@@ -44,7 +76,7 @@
         <dependency>
             <groupId>com.squareup</groupId>
             <artifactId>javapoet</artifactId>
-            <version>1.1.0</version>
+            <version>${javapoet-version}</version>
         </dependency>
 
     </dependencies>
